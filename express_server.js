@@ -1,11 +1,11 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const morgan = require('morgan')
+const morgan = require('morgan');
 
 app.set("view engine", "ejs");
 
-app.use(morgan('dev'))
+app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
@@ -15,41 +15,50 @@ const urlDatabase = {
 
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
-}
+};
 
 
 // submit handle for new url items
 app.post("/urls", (req, res) => {
-  const id = generateRandomString()
+  const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
   // const urlDatabase = {
   //   [id]: req.body.longURL,
   // }
-  urlDatabase[id] = req.body.longURL
-  res.redirect(`/urls/${id}`)
+  urlDatabase[id] = req.body.longURL;
+  res.redirect(`/urls/${id}`);
 });
 
 // DELETE - POST /u/:id/delete
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
-  res.redirect('/urls')
-})
+  res.redirect('/urls');
+});
 
+// EDIT - POST
+app.post('/urls/:id', (req, res) => {
+  const id = req.params.id
+  console.log('urlDatabase[id]', urlDatabase[id])
+  urlDatabase[id] = req.body.newURLname
+  res.redirect('/urls');
+});
+
+// BROWSE - GET /urls
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
-
+// READ - GET /u/:id
 app.get('/u/:id', (req, res) => {
-  const longURL = urlDatabase[req.params.id]
+  const longURL = urlDatabase[req.params.id];
   if (longURL === undefined) {
-    res.render('404')
+    res.render('404');
   } else {
     res.redirect(longURL);
   }
-}); 
+});
 
 // GET req to add new url
 app.get("/urls/new", (req, res) => {
@@ -73,7 +82,7 @@ app.get("/", (req, res) => {
 // add page error for all other paths
 app.get('*', (req, res) => [
   res.status(404).render('404')
-])
+]);
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
