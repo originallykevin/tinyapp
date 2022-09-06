@@ -56,6 +56,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+// GET new short url page
 app.get("/urls/:id", (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
   res.render("urls_show", templateVars);
