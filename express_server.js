@@ -1,8 +1,12 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+const morgan = require('morgan')
 
 app.set("view engine", "ejs");
+
+app.use(morgan('dev'))
+app.use(express.urlencoded({ extended: true }));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -13,8 +17,11 @@ const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 }
 
-app.use(express.urlencoded({ extended: true }));
 
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
 // submit handle for new url items
 app.post("/urls", (req, res) => {
   const id = generateRandomString()
@@ -34,11 +41,6 @@ app.get('/u/:id', (req, res) => {
     res.redirect(longURL);
   }
 }); 
-
-app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
 
 // GET req to add new url
 app.get("/urls/new", (req, res) => {
@@ -69,7 +71,7 @@ app.get("/hello", (req, res) => {
 
 // add page error for all other paths
 app.get('*', (req, res) => [
-  res.render('404')
+  res.status(404).render('404')
 ])
 
 app.listen(PORT, () => {
