@@ -9,22 +9,38 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-function generateRandomString() {
-  Math.random().toString(36).substring(1, 6);
+const generateRandomString = () => {
+  return Math.random().toString(36).substring(2, 8);
 }
 
 app.use(express.urlencoded({ extended: true }));
 
+// submit handle for new url items
 app.post("/urls", (req, res) => {
+  const id = generateRandomString()
   console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  // const urlDatabase = {
+  //   [id]: req.body.longURL,
+  // }
+  urlDatabase[id] = req.body.longURL
+  res.redirect(`/urls/${id}`)
 });
+
+app.get('/u/:id', (req, res) => {
+  const longURL = urlDatabase[req.params.id]
+  if (longURL === undefined) {
+    res.render('404')
+  } else {
+    res.redirect(longURL);
+  }
+}); 
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
 });
 
+// GET req to add new url
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
@@ -51,14 +67,10 @@ app.get("/hello", (req, res) => {
   res.render("hello_world", templateVars);
 });
 
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
+// add page error for all other paths
+app.get('*', (req, res) => [
+  res.render('404')
+])
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
