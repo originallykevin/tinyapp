@@ -66,6 +66,15 @@ app.get('/', function(req, res) {
   console.log('Signed Cookies: ', req.signedCookies);
 });
 
+// GET /registration page. 
+app.get('/register', (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies.username,
+  };
+  res.render("registration", templateVars)
+})
+
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
   const templateVars = {
@@ -118,5 +127,5 @@ app.get('*', (req, res) => [
 ]);
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Server is listening on port ${PORT}!`);
 });
