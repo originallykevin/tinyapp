@@ -53,8 +53,7 @@ app.post('/login', (req, res) => {
 
 // POST urls/logout
 app.post('/logout', (req, res) => {
-  const cookie = req.body.username;
-  res.clearCookie("username", cookie); // once logout, cookies will be cleared
+  res.clearCookie("user_id"); // once logout, cookies will be cleared
   res.redirect('/urls');
 });
 
@@ -75,18 +74,12 @@ app.post('/urls/:id', (req, res) => {
 // POST - /register
 app.post('/register', (req, res) => {
   const user_id = generateRandomString(); // generate random userID
-  const cookie = req.body.user_id;
   users[user_id] = {
     id: user_id,
     email: req.body.email,
     password: req.body.password,
   };
-  const templateVars = {
-    urls: urlDatabase,
-    username: user_id,
-  };
-  res.render('registration', templateVars)
-  res.cookie("user_id", cookie);
+  res.cookie("user_id", user_id);
   res.redirect('/urls');
 });
 
@@ -101,17 +94,17 @@ app.get('/', function(req, res) {
 // GET /register page. 
 app.get('/register', (req, res) => {
   const templateVars = {
-    urls: urlDatabase,
-    username: req.cookies.username,
+    user: users[req.cookies['user_id']],
   };
   res.render("registration", templateVars);
 });
 
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
+// console.log("req.cookies['user_id']", req.cookies['user_id'])
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies.username,
+    user: users[req.cookies['user_id']], // this has value of generated id
   };
   res.render("urls_index", templateVars);
 });
@@ -131,13 +124,14 @@ app.get('/u/:id', (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies.username,
+    user: users[req.cookies['user_id']],
   };
   res.render("urls_new", templateVars);
 });
 
 // GET new short url page
 app.get("/urls/:id", (req, res) => {
+  console.log('here in /urls/:id')
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
