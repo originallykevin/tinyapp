@@ -14,7 +14,7 @@
       </div>
     </div>
     <!-- If no username is found then the login button with username input will be available -->
-    <% if(!username){ %> 
+    <% if(!user){ %> 
       <h1></h1>
       <form class="form-inline" method="POST" action="/login">
         <div class="mr-auto p-2">
@@ -26,7 +26,7 @@
     <!-- if username is found, there is the option to logout of that username  -->
     <% } else{ %>  
       <form class="form-inline" method="POST" action="/logout">
-        <label>Logged in as: <%=username %></label>
+        <label>Logged in as: <%=user.email%></label>
         <button type="submit" class="btn btn-success">Logout</button>
       </form>
       
