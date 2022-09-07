@@ -2,11 +2,13 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 app.set("view engine", "ejs");
 
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -22,9 +24,6 @@ const generateRandomString = () => {
 app.post("/urls", (req, res) => {
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
-  // const urlDatabase = {
-  //   [id]: req.body.longURL,
-  // }
   urlDatabase[id] = req.body.longURL;
   res.redirect(`/urls/${id}`);
 });
@@ -38,9 +37,17 @@ app.post('/urls/:id/delete', (req, res) => {
 
 // EDIT - POST
 app.post('/urls/:id', (req, res) => {
-  const id = req.params.id
-  urlDatabase[id] = req.body.newURLname
+  const id = req.params.id;
+  urlDatabase[id] = req.body.newURLname;
   res.redirect('/urls');
+});
+
+// Cookie-parser
+app.get('/', function(req, res) {
+  // Cookies that have not been signed
+  console.log('Cookies: ', req.cookies);
+  // Cookies that have been signed
+  console.log('Signed Cookies: ', req.signedCookies);
 });
 
 // BROWSE - GET /urls
