@@ -74,18 +74,21 @@ app.post('/urls/:id', (req, res) => {
 
 // POST - /register
 app.post('/register', (req, res) => {
-  const user_id = generateRandomString() // generate random userID
-  const cookie = req.body.user_id
+  const user_id = generateRandomString(); // generate random userID
+  const cookie = req.body.user_id;
   users[user_id] = {
     id: user_id,
     email: req.body.email,
     password: req.body.password,
-  }
-  console.log('test', req.body.email)
-  console.log('users', users)
-  res.cookie("user_id", cookie)
-  res.redirect('/urls')
-})
+  };
+  const templateVars = {
+    urls: urlDatabase,
+    username: user_id,
+  };
+  res.render('registration', templateVars)
+  res.cookie("user_id", cookie);
+  res.redirect('/urls');
+});
 
 // Cookie-parser
 app.get('/', function(req, res) {
@@ -101,8 +104,8 @@ app.get('/register', (req, res) => {
     urls: urlDatabase,
     username: req.cookies.username,
   };
-  res.render("registration", templateVars)
-})
+  res.render("registration", templateVars);
+});
 
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
@@ -117,7 +120,7 @@ app.get("/urls", (req, res) => {
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
   // url is not found then it will be directed to 404.ejs
-  if (longURL === undefined) { 
+  if (longURL === undefined) {
     res.render('404');
   } else {
     res.redirect(longURL);
