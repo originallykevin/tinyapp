@@ -15,6 +15,20 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// store and access the users in the app.
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk",
+  },
+};
+
 // create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
@@ -32,7 +46,7 @@ app.post("/urls", (req, res) => {
 // COOKIE - POST urls/login
 app.post('/login', (req, res) => {
   const cookie = req.body.username;
-  console.log('req.body.username', req.body.username)
+  // console.log('req.body.username', req.body.username)
   res.cookie("username", cookie); // cookie with username
   res.redirect('/urls');
 });
@@ -58,6 +72,21 @@ app.post('/urls/:id', (req, res) => {
   res.redirect('/urls');
 });
 
+// POST - /register
+app.post('/register', (req, res) => {
+  const user_id = generateRandomString() // generate random userID
+  const cookie = req.body.user_id
+  users[user_id] = {
+    id: user_id,
+    email: req.body.email,
+    password: req.body.password,
+  }
+  console.log('test', req.body.email)
+  console.log('users', users)
+  res.cookie("user_id", cookie)
+  res.redirect('/urls')
+})
+
 // Cookie-parser
 app.get('/', function(req, res) {
   // Cookies that have not been signed
@@ -66,7 +95,7 @@ app.get('/', function(req, res) {
   console.log('Signed Cookies: ', req.signedCookies);
 });
 
-// GET /registration page. 
+// GET /register page. 
 app.get('/register', (req, res) => {
   const templateVars = {
     urls: urlDatabase,
