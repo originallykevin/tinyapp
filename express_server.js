@@ -28,6 +28,13 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`);
 });
 
+// COOKIE - POST urls/login
+app.post('/login', (req, res) => {
+  const cookie = req.body.username;
+  res.cookie("username", cookie);
+  res.redirect('/urls');
+});
+
 // DELETE - POST /u/:id/delete
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
@@ -52,7 +59,10 @@ app.get('/', function(req, res) {
 
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"],
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -73,7 +83,10 @@ app.get("/urls/new", (req, res) => {
 
 // GET new short url page
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+  };
   res.render("urls_show", templateVars);
 });
 
