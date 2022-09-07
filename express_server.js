@@ -15,6 +15,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
@@ -32,15 +33,14 @@ app.post("/urls", (req, res) => {
 app.post('/login', (req, res) => {
   const cookie = req.body.username;
   console.log('req.body.username', req.body.username)
-  res.cookie("username", cookie);
+  res.cookie("username", cookie); // cookie with username
   res.redirect('/urls');
 });
 
 // POST urls/logout
 app.post('/logout', (req, res) => {
-  console.log('cookie', res)
   const cookie = req.body.username;
-  res.clearCookie("username", cookie);
+  res.clearCookie("username", cookie); // once logout, cookies will be cleared
   res.redirect('/urls');
 });
 
@@ -78,7 +78,8 @@ app.get("/urls", (req, res) => {
 // READ - GET /u/:id
 app.get('/u/:id', (req, res) => {
   const longURL = urlDatabase[req.params.id];
-  if (longURL === undefined) {
+  // url is not found then it will be directed to 404.ejs
+  if (longURL === undefined) { 
     res.render('404');
   } else {
     res.redirect(longURL);
