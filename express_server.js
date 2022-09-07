@@ -39,7 +39,6 @@ app.post('/urls/:id/delete', (req, res) => {
 // EDIT - POST
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id
-  console.log('urlDatabase[id]', urlDatabase[id])
   urlDatabase[id] = req.body.newURLname
   res.redirect('/urls');
 });
