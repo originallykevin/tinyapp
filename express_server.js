@@ -34,7 +34,7 @@ const getUserByEmail = function(users, email) {
   for (let user in users) {
     console.log(users[user].email);
     if (users[user].email === email) {
-      return true;
+      return user;
     }
   }
 };
@@ -54,47 +54,51 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`);
 });
 
-// COOKIE - POST urls/login
 app.post('/login', (req, res) => {
-  const cookie = req.body.username;
-  // console.log('req.body.username', req.body.username)
-  res.cookie("username", cookie); // cookie with username
-  res.redirect('/urls');
+  const userEmail = req.body.email;
+  const userPassword = req.body.password;
+  const user_id = getUserByEmail(users, userEmail)
+// check if user email found
+  if (!user_id) {
+    return res.status(403).render('403')
+  }
+// check if user email and user password match
+  if (users[user_id].email === userEmail && users[user_id].password === userPassword) {
+    res.cookie("user_id", user_id); // cookie with user_id
+    res.redirect('/urls');
+  } else {
+    return res.status(403).render('403')
+  }
 });
 
-// POST urls/logout
 app.post('/logout', (req, res) => {
   res.clearCookie("user_id"); // once logout, cookies will be cleared
   res.redirect('/urls');
 });
 
-// DELETE - POST /u/:id/delete
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
   delete urlDatabase[id];
   res.redirect('/urls');
 });
 
-// EDIT - POST
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
   urlDatabase[id] = req.body.newURLname;
   res.redirect('/urls');
 });
 
-// POST - /register
 app.post('/register', (req, res) => {
   const user_id = generateRandomString(); // generate random userID
-  const email = req.body.email
-  const password = req.body.password
-  
+  const email = req.body.email;
+  const password = req.body.password;
   // If the e-mail or password are empty strings, send 404
-  if (!email || !password ) {
+  if (!email || !password) {
     return res.status(404).render('404');
   }
   // register with an email that is already in the users object, send 404
   if (getUserByEmail(users, email)) {
-    return res.status(404).send('Email already exist');
+    return res.status(404).render('404');
   }
   // Move database under if statement above because we want to check email against existing database prior to adding it. 
   users[user_id] = {
@@ -106,7 +110,6 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 });
 
-
 // Cookie-parser
 app.get('/', function(req, res) {
   // Cookies that have not been signed
@@ -115,15 +118,14 @@ app.get('/', function(req, res) {
   console.log('Signed Cookies: ', req.signedCookies);
 });
 
-// GET /login page
 app.get('/login', (req, res) => {
   const templateVars = {
+    urls: urlDatabase,
     user: users[req.cookies['user_id']],
   };
-  res.render("login", templateVars)
-})
+  res.render("login", templateVars);
+});
 
-// GET /register page. 
 app.get('/register', (req, res) => {
   const templateVars = {
     user: users[req.cookies['user_id']],
