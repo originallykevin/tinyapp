@@ -17,16 +17,13 @@ app.use(cookieSession({
   name: 'cookieMonster',
   keys: ['anything', 'something'],
 
-  // Cookie Options
-  // maxAge: 24 * 60 * 60 * 1000 // 24 hours
-
 }));
 
-// Old database
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
+//////// HELPER FUNCTIONS /////////
+// keeping seperate to see comments of each
+const { getUserByEmail } = require('./helperFunction') // check if email is in users{ } for 
+const { urlsForUser } = require('./helperFunction') // user can only see their database 
+
 
 // NEW database
 const urlDatabase = {
@@ -66,34 +63,10 @@ const users = {
   }
 };
 
-// check if email is in users{ } for 
-const getUserByEmail = function(users, email) {
-  for (let user in users) {
-    // console.log(users[user].email);
-    if (users[user].email === email) {
-      return user;
-    }
-  }
-};
-
-// user can only see their database 
-const urlsForUser = function(database, userID) {
-  let newDatabase = {};
-  for (let url in database) {
-    if (database[url].userID === userID) {
-      newDatabase[url] = database[url].longURL;
-    }
-  }
-  return newDatabase;
-};
-// console.log(urlsForUser(urlDatabase, "aJ48lW"));
-// console.log(urlsForUser(urlDatabase, "myUser"));
-
 // create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
 };
-
 
 // submit handle for new url items
 app.post("/urls", (req, res) => {
