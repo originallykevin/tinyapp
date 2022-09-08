@@ -14,25 +14,26 @@
       </div>
     </div>
     <!-- If no username is found then the login button with username input will be available -->
-    <% if(!user){ %> 
-      <h1></h1>
-      <form class="form-inline" method="POST" action="/login">
-        <div class="mr-auto p-2">
-          <label></label>
-          <input class="form-control mr-sm-2" type="text" name="username"  placeholder="Username">
-          <button type="submit" class="btn btn-success">Login</button>
-        </div>
-      </form>
-    <!-- if username is found, there is the option to logout of that username  -->
-    <% } else{ %>  
-      <form class="form-inline" method="POST" action="/logout">
-        <label>Logged in as: <%=user.email%></label>
-        <button type="submit" class="btn btn-success">Logout</button>
-      </form>
-      
-   <% } %>
 
-    
-    
+    <% if(!user){ %>
+      
+      <div class="form-inline">
+        <div class="d-grid gap-2 d-md-block">
+          <a href="/register" class="btn btn-outline-dark" tabindex="-1" role="button">Register</a>
+          <a href="/login" class="btn btn-outline-dark" tabindex="-1" role="button">Login</a>
+        </div>
+      </div>
+
+      <!-- if username is found, there is the option to logout of that username  -->
+      <% } else{ %>
+        <form class="form-inline" method="POST" action="/logout">
+          <label>Logged in as: <%=user.email%></label>
+          <button type="submit" class="btn btn-success">Logout</button>
+        </form>
+
+        <% } %>
+
+
+
   </nav>
 </header>
