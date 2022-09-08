@@ -10,9 +10,29 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Old database
+// const urlDatabase = {
+//   "b2xVn2": "http://www.lighthouselabs.ca",
+//   "9sm5xK": "http://www.google.com"
+// };
+
+// NEW database
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+  h31l0u: {
+    longURL: "https://www.github.com",
+    userID: "myUser",
+  },
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "myUser",
+  }
 };
 
 // store and access the users in the app.
@@ -27,6 +47,11 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk",
   },
+  myUser: {
+    id: "myUser",
+    email: "a@b.com",
+    password: "1234",
+  }
 };
 
 // check if email is in users{ } for 
@@ -38,7 +63,19 @@ const getUserByEmail = function(users, email) {
     }
   }
 };
-// getUserByEmail(users, "email")
+
+// user can only see their database 
+const urlsForUser = function(database, userID) {
+  let newDatabase = {};
+  for (let url in database) {
+    if (database[url].userID === userID) {
+      newDatabase[url] = database[url].longURL;
+    }
+  }
+  return newDatabase;
+};
+// console.log(urlsForUser(urlDatabase, "aJ48lW"));
+// console.log(urlsForUser(urlDatabase, "myUser"));
 
 // create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
@@ -48,13 +85,18 @@ const generateRandomString = () => {
 
 // submit handle for new url items
 app.post("/urls", (req, res) => {
+
   // prevent users not logged in from POST /urls for security measures
-  if (!req.cookies.user_id) {
+  const user_id = req.cookies.user_id;
+  if (!user_id) {
     res.send('Please login to shorten URL');
   }
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id] = {
+    longURL: req.body.longURL,
+    userID: user_id,
+  };
   res.redirect(`/urls/${id}`);
 });
 
@@ -134,22 +176,23 @@ app.get('/login', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
+  const user_id = req.cookies['user_id'];
   // if user is logged in, /register will redirect to /urls
-  if (req.cookies.user_id) {
+  if (user_id) {
     res.redirect('/urls');
   }
   const templateVars = {
-    user: users[req.cookies['user_id']],
+    user: users[user_id],
   };
   res.render("registration", templateVars);
 });
 
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
-  // console.log("req.cookies['user_id']", req.cookies['user_id'])
+  const user_id = req.cookies['user_id'];
   const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies['user_id']], // this has value of generated id
+    urls: urlsForUser(urlDatabase, user_id),
+    user: users[user_id], // this has value of generated id
   };
   res.render("urls_index", templateVars);
 });
@@ -160,7 +203,7 @@ app.get('/u/:id', (req, res) => {
   if (!req.params.id) {
     res.send('Does not exist in database');
   }
-  const longURL = urlDatabase[req.params.id];
+  const longURL = urlDatabase[req.params.id].longURL;
   // url is not found then it will be directed to 404.ejs
   if (longURL === undefined) {
     res.render('404');
@@ -171,13 +214,14 @@ app.get('/u/:id', (req, res) => {
 
 // GET req to add new url
 app.get("/urls/new", (req, res) => {
+  const user_id = req.cookies['user_id'];
   // if user is not logged in, redirect to /login
-  if (!req.cookies.user_id) {
+  if (!user_id) {
     res.redirect('/login');
   }
   const templateVars = {
-    urls: urlDatabase,
-    user: users[req.cookies['user_id']],
+    urls: urlsForUser(urlDatabase, user_id),
+    user: users[user_id],
   };
   res.render("urls_new", templateVars);
 });
@@ -186,7 +230,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
   };
   res.render("urls_show", templateVars);
 });
