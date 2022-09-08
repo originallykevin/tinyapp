@@ -29,6 +29,17 @@ const users = {
   },
 };
 
+// check if email is in users{ } for 
+const getUserByEmail = function(users, email) {
+  for (let user in users) {
+    console.log(users[user].email);
+    if (users[user].email === email) {
+      return true;
+    }
+  }
+};
+getUserByEmail(users, "a@b.com")
+
 // create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
   return Math.random().toString(36).substring(2, 8);
@@ -74,14 +85,27 @@ app.post('/urls/:id', (req, res) => {
 // POST - /register
 app.post('/register', (req, res) => {
   const user_id = generateRandomString(); // generate random userID
+  const email = req.body.email
+  const password = req.body.password
+  
+  // If the e-mail or password are empty strings, send 404
+  if (!email || !password ) {
+    return res.status(404).render('404');
+  }
+  // register with an email that is already in the users object, send 404
+  if (getUserByEmail(users, email)) {
+    return res.status(404).send('Email already exist');
+  }
+  // Move database under if statement above because we want to check email against existing database prior to adding it. 
   users[user_id] = {
     id: user_id,
-    email: req.body.email,
-    password: req.body.password,
+    email,
+    password,
   };
   res.cookie("user_id", user_id);
   res.redirect('/urls');
 });
+
 
 // Cookie-parser
 app.get('/', function(req, res) {
@@ -101,7 +125,7 @@ app.get('/register', (req, res) => {
 
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
-// console.log("req.cookies['user_id']", req.cookies['user_id'])
+  // console.log("req.cookies['user_id']", req.cookies['user_id'])
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies['user_id']], // this has value of generated id
@@ -131,7 +155,6 @@ app.get("/urls/new", (req, res) => {
 
 // GET new short url page
 app.get("/urls/:id", (req, res) => {
-  console.log('here in /urls/:id')
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
