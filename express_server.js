@@ -48,6 +48,10 @@ const generateRandomString = () => {
 
 // submit handle for new url items
 app.post("/urls", (req, res) => {
+  // prevent users not logged in from POST /urls for security measures
+  if (!req.cookies.user_id) {
+    res.send('Please login to shorten URL');
+  }
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
   urlDatabase[id] = req.body.longURL;
@@ -152,6 +156,10 @@ app.get("/urls", (req, res) => {
 
 // READ - GET /u/:id
 app.get('/u/:id', (req, res) => {
+  // if user tries to access a shorten url not in database
+  if (!req.params.id) {
+    res.send('Does not exist in database');
+  }
   const longURL = urlDatabase[req.params.id];
   // url is not found then it will be directed to 404.ejs
   if (longURL === undefined) {
@@ -163,6 +171,10 @@ app.get('/u/:id', (req, res) => {
 
 // GET req to add new url
 app.get("/urls/new", (req, res) => {
+  // if user is not logged in, redirect to /login
+  if (!req.cookies.user_id) {
+    res.redirect('/login');
+  }
   const templateVars = {
     urls: urlDatabase,
     user: users[req.cookies['user_id']],
