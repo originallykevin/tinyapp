@@ -1,6 +1,5 @@
 const express = require("express");
 const morgan = require('morgan');
-// const cookieParser = require('cookie-parser')
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
@@ -12,17 +11,15 @@ app.set("view engine", "ejs");
 //////// MIDDLEWARE /////////
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
 app.use(cookieSession({
   name: 'cookieMonster',
   keys: ['anything', 'something'],
-
 }));
 
 //////// HELPER FUNCTIONS /////////
 // keeping seperate to see comments of each
-const { getUserByEmail } = require('./helperFunction') // check if email is in users{ } for 
-const { urlsForUser } = require('./helperFunction') // user can only see their database 
+const { getUserByEmail } = require('./helpers'); // check if email is in users{ } for 
+const { urlsForUser } = require('./helpers'); // user can only see their database 
 
 
 // NEW database
@@ -73,7 +70,7 @@ app.post("/urls", (req, res) => {
   // prevent users not logged in from POST /urls for security measures
   const user_id = req.session.user_id;
   if (!user_id) {
-    res.send('Please login to shorten URL');
+    return res.send('Please login to shorten URL');
   }
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
@@ -92,7 +89,6 @@ app.post('/login', (req, res) => {
   if (!user_id) {
     return res.status(403).send('No user with that username found');
   }
-
   // compare user enter password vs. hashed password and return/false
   const result = bcrypt.compareSync(userPassword, users[user_id].password);
   // check if user email and user password match
@@ -203,12 +199,12 @@ app.get("/urls", (req, res) => {
 app.get('/u/:id', (req, res) => {
   // if user tries to access a shorten url not in database
   if (!req.params.id) {
-    res.send('Does not exist in database');
+    return res.send('Does not exist in database');
   }
   const longURL = urlDatabase[req.params.id].longURL;
   // url is not found then it will be directed to 404.ejs
   if (longURL === undefined) {
-    res.render('404');
+    return res.render('404');
   } else {
     res.redirect(longURL);
   }
@@ -219,7 +215,7 @@ app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
   // if user is not logged in, redirect to /login
   if (!user_id) {
-    res.redirect('/login');
+    return res.redirect('/login');
   }
   const templateVars = {
     urls: urlsForUser(urlDatabase, user_id),
