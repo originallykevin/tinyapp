@@ -16,7 +16,7 @@
     <!-- If no username is found then the login button with username input will be available -->
 
     <% if(!user){ %>
-      
+
       <div class="form-inline">
         <div class="d-grid gap-2 d-md-block">
           <a href="/register" class="btn btn-outline-dark" tabindex="-1" role="button">Register</a>
@@ -30,10 +30,7 @@
           <label>Logged in as: <%=user.email%></label>
           <button type="submit" class="btn btn-success">Logout</button>
         </form>
-
-        <% } %>
-
-
+      <% } %>
 
   </nav>
 </header>
