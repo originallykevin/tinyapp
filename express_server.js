@@ -57,17 +57,17 @@ app.post("/urls", (req, res) => {
 app.post('/login', (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  const user_id = getUserByEmail(users, userEmail)
-// check if user email found
+  const user_id = getUserByEmail(users, userEmail);
+  // check if user email found
   if (!user_id) {
-    return res.status(403).render('403')
+    return res.status(403).render('403');
   }
-// check if user email and user password match
+  // check if user email and user password match
   if (users[user_id].email === userEmail && users[user_id].password === userPassword) {
     res.cookie("user_id", user_id); // cookie with user_id
     res.redirect('/urls');
   } else {
-    return res.status(403).render('403')
+    return res.status(403).render('403');
   }
 });
 
@@ -119,14 +119,21 @@ app.get('/', function(req, res) {
 });
 
 app.get('/login', (req, res) => {
+  // if user is logged in, /login will redirect to /urls
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
-    urls: urlDatabase,
     user: users[req.cookies['user_id']],
   };
   res.render("login", templateVars);
 });
 
 app.get('/register', (req, res) => {
+  // if user is logged in, /register will redirect to /urls
+  if (req.cookies.user_id) {
+    res.redirect('/urls');
+  }
   const templateVars = {
     user: users[req.cookies['user_id']],
   };
