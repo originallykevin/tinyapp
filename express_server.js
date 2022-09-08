@@ -38,7 +38,7 @@ const getUserByEmail = function(users, email) {
     }
   }
 };
-getUserByEmail(users, "a@b.com")
+// getUserByEmail(users, "email")
 
 // create random 6 letter/nmber string for an id tag
 const generateRandomString = () => {
@@ -114,6 +114,14 @@ app.get('/', function(req, res) {
   // Cookies that have been signed
   console.log('Signed Cookies: ', req.signedCookies);
 });
+
+// GET /login page
+app.get('/login', (req, res) => {
+  const templateVars = {
+    user: users[req.cookies['user_id']],
+  };
+  res.render("login", templateVars)
+})
 
 // GET /register page. 
 app.get('/register', (req, res) => {
