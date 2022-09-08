@@ -94,7 +94,7 @@ app.post("/urls", (req, res) => {
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
   urlDatabase[id] = {
-    longURL: req.body.longURL,
+    longURL: `http://${req.body.longURL}`,
     userID: user_id,
   };
   res.redirect(`/urls/${id}`);
@@ -129,8 +129,13 @@ app.post('/urls/:id/delete', (req, res) => {
 });
 
 app.post('/urls/:id', (req, res) => {
+  const user_id = req.cookies['user_id'];
   const id = req.params.id;
-  urlDatabase[id] = req.body.newURLname;
+  // urlDatabase[id] = req.body.newURLname;
+  urlDatabase[id] = {
+    longURL: `http://${req.body.newURLname}`,
+    userID: user_id,
+  };
   res.redirect('/urls');
 });
 
@@ -165,12 +170,13 @@ app.get('/', function(req, res) {
 });
 
 app.get('/login', (req, res) => {
+  const user_id = req.cookies['user_id']
   // if user is logged in, /login will redirect to /urls
   if (req.cookies.user_id) {
     res.redirect('/urls');
   }
   const templateVars = {
-    user: users[req.cookies['user_id']],
+    user: users[user_id],
   };
   res.render("login", templateVars);
 });
