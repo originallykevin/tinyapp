@@ -159,7 +159,7 @@ app.post('/register', (req, res) => {
     email,
     password: hash // update password to hashed password
   };
-  console.log("users[user_id]", users[user_id]);
+  // console.log("users[user_id]", users); // check if new user gets added to user list
   // res.cookie("user_id", user_id);
   req.session.user_id = user_id;
   return res.redirect('/urls');
@@ -193,7 +193,8 @@ app.get('/register', (req, res) => {
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
   if (!user_id) { // if user not logged in redirect to 403 
-    return res.render('403');
+    // return res.render('403'); // As per project instructions but removing and redirect to login page instead because it sends a 403 after GET /logout
+    return res.redirect('/login')
   }
   const templateVars = {
     urls: urlsForUser(urlDatabase, user_id),
@@ -236,8 +237,8 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const user_id = req.session['user_id'];
-  if (!user_id) {
-    return res.render('403');
+  if (!user_id) { 
+    return res.render('403');  // if user not logged in redirect to 403
   }
   const templateVars = {
     id: id,

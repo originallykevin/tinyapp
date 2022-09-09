@@ -1,26 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-      integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
-    <title>TinyApp</title>
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
+  <title>TinyApp</title>
+</head>
 
 <body>
   <%- include('partials/_header') %>
-    <form method="POST" action="/register">
-      <h1>Registration </h1>
-      <p>Email: <input type="email" name="email"></p>
-      <p>Password: <input type="password" name="password"></p>
-      <button type="submit"> Register </button>
-    </form>
 
-  <!-- Bootstrap JS -->
+  <div>
+    <form method="POST" action="/register">
+      <h2 class="nav-item nav-link">Registration</h2>
+      <p class="nav-item nav-link"> Register with us today for free</p>
+      <div class="mb-3">
+        <label class="nav-item nav-link" for="exampleInputEmail1" >Email address</label>
+        <input style="width: 300px; margin: 1em" type="email" name="email" class="form-control"  aria-describedby="emailHelp">
+      </div>
+      <div class="mb-3">
+        <label class="nav-item nav-link" for="exampleInputPassword1" >Password</label>
+        <input style="width: 300px; margin: 1em" type="password" name="password" class="form-control"> 
+      </div>
+      <button style="width: 100px; margin: 1em" type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+
+
+    <!-- <form method="POST" action="/register">
+      <h1>Registration </h1>
+      <label for="exampleInputEmail1" class="form-label">Email address</label>
+      <input type="email" name="email">
+      <p>Password: <input type="password" name="password"></p>
+      <button type="submit" class="btn btn-primary"> Register </button>
+    </form> -->
+
+    <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
       crossorigin="anonymous"></script>
