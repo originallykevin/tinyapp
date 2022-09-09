@@ -166,18 +166,10 @@ app.post('/register', (req, res) => {
   return res.redirect('/urls');
 });
 
-// Cookie-parser
-app.get('/', function(req, res) {
-  // Cookies that have not been signed
-  console.log('Cookies: ', req.session);
-  // Cookies that have been signed
-  console.log('Signed Cookies: ', req.signedCookies);
-});
-
 app.get('/login', (req, res) => {
   const user_id = req.session['user_id'];
   // if user is logged in, /login will redirect to /urls
-  if (req.session.user_id) {
+  if (user_id) {
     return res.redirect('/urls');
   }
   const templateVars = {
@@ -251,6 +243,11 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  const user_id = req.session['user_id'];
+  // if user is not logged in. redirect to /login
+  if (!user_id) {
+    return res.redirect('/login');
+  }
   res.redirect('/urls');
 });
 
