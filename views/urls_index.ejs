@@ -29,10 +29,10 @@
         <% for (let id in urls) { %>
           <tr>
             <td>
-              <%= id %>
+             <a href="<%=urls[id] %>"><%= id %></a> 
             </td>
             <td>
-              <%= urls[id] %>
+              <a href="<%=urls[id] %>"><%=urls[id] %></a>
             </td>
             <td><a href="/urls/<%=id%>"><button type="submit" class="btn btn-outline-primary">Edit</button></a>
             </td>
