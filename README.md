@@ -4,10 +4,22 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
+### Login
+
 !["Login page"](https://github.com/originallykevin/tinyapp/blob/master/docs/login.gif)
+
+### Register
+
 !["Registration"](https://github.com/originallykevin/tinyapp/blob/master/docs/registration.gif)
-!["Creat-edit-delete url"](https://github.com/originallykevin/tinyapp/blob/master/docs/create_edit_delete.gif)
-!["Access short-url"](https://github.com/originallykevin/tinyapp/blob/master/docs/access_shorturl.gif)
+
+### Creating, editing and deleting urls
+
+!["Create-edit-delete url"](https://github.com/originallykevin/tinyapp/blob/master/docs/create_edit_delete.gif)
+
+### Accessing short urls
+
+!["Access short url"](https://github.com/originallykevin/tinyapp/blob/master/docs/access_shorturl.gif)
+
 
 ## Dependencies
 
