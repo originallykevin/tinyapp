@@ -43,17 +43,17 @@ const users = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10),
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: bcrypt.hashSync("dishwasher-funk", 10),
   },
   myUser: {
     id: "myUser",
     email: "a@b.com",
-    password: "1234",
+    password: bcrypt.hashSync("1234", 10)
   }
 };
 
@@ -156,7 +156,6 @@ app.post('/register', (req, res) => {
 
   // Move database under if statement above because we want to check email against existing database prior to adding it. 
   users[user_id] = {
-    // id: user_id,
     email,
     password: hash // update password to hashed password
   };
@@ -193,6 +192,9 @@ app.get('/register', (req, res) => {
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
+  if (!user_id) { // if user not logged in redirect to 403 
+    return res.render('403');
+  }
   const templateVars = {
     urls: urlsForUser(urlDatabase, user_id),
     user: users[user_id], // this has value of generated id
@@ -202,11 +204,12 @@ app.get("/urls", (req, res) => {
 
 // READ - GET /u/:id
 app.get('/u/:id', (req, res) => {
+  const id = req.params.id;
   // if user tries to access a shorten url not in database
-  if (!req.params.id) {
+  if (!id) {
     return res.send('Does not exist in database');
   }
-  const longURL = urlDatabase[req.params.id].longURL;
+  const longURL = urlDatabase[id].longURL;
   // url is not found then it will be directed to 404.ejs
   if (longURL === undefined) {
     return res.render('404');
@@ -231,9 +234,14 @@ app.get("/urls/new", (req, res) => {
 
 // GET new short url page
 app.get("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const user_id = req.session['user_id'];
+  if (!user_id) {
+    return res.render('403');
+  }
   const templateVars = {
-    id: req.params.id,
-    longURL: urlDatabase[req.params.id].longURL,
+    id: id,
+    longURL: urlDatabase[id].longURL,
   };
   res.render("urls_show", templateVars);
 });
