@@ -23,6 +23,7 @@ const { getUserByEmail, urlsForUser, generateRandomString } = require('./helpers
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
+    userID: "myUser",
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
@@ -63,7 +64,7 @@ app.post("/urls", (req, res) => {
   // prevent users not logged in from POST /urls for security measures
   const user_id = req.session.user_id;
   if (!user_id) {
-    return res.send('Please login to shorten URL');
+    return res.status(403).send('Please login to shorten URL');
   }
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
@@ -74,7 +75,7 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`);
 });
 
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const user_id = getUserByEmail(userEmail, users);
@@ -89,19 +90,19 @@ app.post('/login', (req, res) => {
   if (users[user_id].email === userEmail && result) {
     // res.cookie("user_id", user_id); // cookie with user_id
     req.session.user_id = user_id;
-    return res.redirect('/urls');
+    return res.redirect("/urls");
   } else {
     return res.status(403).send('username or password does not match');
   }
 });
 
-app.post('/logout', (req, res) => {
+app.post("/logout", (req, res) => {
   // res.clearCookie("user_id"); // once logout, cookies will be cleared
   req.session = null;
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 
-app.post('/urls/:id/delete', (req, res) => {
+app.post("/urls/:id/delete", (req, res) => {
   const user_id = req.session['user_id'];
   const id = req.params.id;
   // if shortURL(id) does not exist
@@ -117,10 +118,10 @@ app.post('/urls/:id/delete', (req, res) => {
     userID: user_id,
   };
   delete urlDatabase[id];
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 
-app.post('/urls/:id', (req, res) => {
+app.post("/urls/:id", (req, res) => {
   const user_id = req.session['user_id'];
   const id = req.params.id;
   // if shortURL(id) does not exist
@@ -135,16 +136,16 @@ app.post('/urls/:id', (req, res) => {
     longURL: `https://${req.body.newURLname}`,
     userID: user_id,
   };
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 
-app.post('/register', (req, res) => {
+app.post("/register", (req, res) => {
   const user_id = generateRandomString(); // generate random userID
   const email = req.body.email;
   const password = req.body.password;
   // If the e-mail or password are empty strings, send 404
   if (!email || !password) {
-    return res.status(404).send('Please enter email and password.');
+    return res.status(404).send('Please enter email and password');
   }
   // register with an email that is already in the users object, send 404
   if (getUserByEmail(email, users)) {
@@ -162,10 +163,10 @@ app.post('/register', (req, res) => {
   // console.log("users[user_id]", users); // check if new user gets added to user list
   // res.cookie("user_id", user_id);
   req.session.user_id = user_id;
-  return res.redirect('/urls');
+  return res.redirect("/urls");
 });
 
-app.get('/login', (req, res) => {
+app.get("/login", (req, res) => {
   const user_id = req.session['user_id'];
   // if user is logged in, /login will redirect to /urls
   if (user_id) {
@@ -177,7 +178,7 @@ app.get('/login', (req, res) => {
   res.render("login", templateVars);
 });
 
-app.get('/register', (req, res) => {
+app.get("/register", (req, res) => {
   const user_id = req.session['user_id'];
   // if user is logged in, /register will redirect to /urls
   if (user_id) {
@@ -194,7 +195,7 @@ app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
   if (!user_id) { // if user not logged in redirect to 403 
     // return res.render('403'); // As per project instructions but removing and redirect to login page instead because it sends a 403 after GET /logout
-    return res.redirect('/login')
+    return res.redirect("/login");
   }
   const templateVars = {
     urls: urlsForUser(urlDatabase, user_id),
@@ -204,17 +205,14 @@ app.get("/urls", (req, res) => {
 });
 
 // READ - GET /u/:id
-app.get('/u/:id', (req, res) => {
+app.get("/u/:id", (req, res) => {
   const id = req.params.id;
   // if user tries to access a shorten url not in database
-  if (!id) {
-    return res.send('Does not exist in database');
-  }
-  const longURL = urlDatabase[id].longURL;
-  // url is not found then it will be directed to 404.ejs
-  if (longURL === undefined) {
-    return res.render('404');
+  if (!urlDatabase[id]) {
+    return res.status(404).render('404');
+    // url is not found then it will be directed to 404.ejs
   } else {
+    const longURL = urlDatabase[id].longURL;
     res.redirect(longURL);
   }
 });
@@ -237,8 +235,16 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const user_id = req.session['user_id'];
-  if (!user_id) { 
-    return res.render('403');  // if user not logged in redirect to 403
+  // if user not logged in and trying to access a shorturl
+  if (!user_id) {
+    return res.status(403).render('403');
+  }
+  if (!urlDatabase[id]) {
+    return res.status(404).render('404'); // if shorturl does not exist in database
+  }
+  // if user logged in trying to access shorturl that is not theirs
+  if (urlDatabase[id].userID !== user_id) {
+    return res.status(403).render('403');
   }
   const templateVars = {
     id: id,
@@ -255,13 +261,13 @@ app.get("/", (req, res) => {
   const user_id = req.session['user_id'];
   // if user is not logged in. redirect to /login
   if (!user_id) {
-    return res.redirect('/login');
+    return res.redirect("/login");
   }
-  res.redirect('/urls');
+  res.redirect("/urls");
 });
 
 // add page error for all other paths
-app.get('*', (req, res) => [
+app.get("*", (req, res) => [
   res.status(404).render('404')
 ]);
 
