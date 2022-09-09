@@ -17,10 +17,7 @@ app.use(cookieSession({
 }));
 
 //////// HELPER FUNCTIONS /////////
-// keeping seperate to see comments of each
-const { getUserByEmail, urlsForUser ,generateRandomString } = require('./helpers'); 
-
-
+const { getUserByEmail, urlsForUser , generateRandomString } = require('./helpers'); 
 
 // NEW database
 const urlDatabase = {
@@ -71,7 +68,7 @@ app.post("/urls", (req, res) => {
   const id = generateRandomString();
   console.log(req.body); // Log the POST request body to the console
   urlDatabase[id] = {
-    longURL: `http://${req.body.longURL}`,
+    longURL: `https://${req.body.longURL}`,
     userID: user_id,
   };
   res.redirect(`/urls/${id}`);
@@ -113,9 +110,16 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const user_id = req.session['user_id'];
   const id = req.params.id;
-  // urlDatabase[id] = req.body.newURLname;
+  // if shortURL(id) does not exist
+  if (!urlDatabase[id]) {
+    return res.status(404).send('This shortURL does not exist')
+  }
+  // if user not logged in or user does not match
+  if (!user_id || urlDatabase[id].userID !== user_id) {
+    return res.status(403).render('403')
+  }
   urlDatabase[id] = {
-    longURL: `http://${req.body.newURLname}`,
+    longURL: `https://${req.body.newURLname}`,
     userID: user_id,
   };
   res.redirect('/urls');
