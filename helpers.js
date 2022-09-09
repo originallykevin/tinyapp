@@ -9,14 +9,6 @@ const getUserByEmail = function(email, database) {
   }
 };
 
-// const getUserByEmail = function(users, email) {
-//   for (let user in users) {
-//     if (users[user].email === email) {
-//       return user;
-//     }
-//   }
-// };
-
 // user can only see their database 
 const urlsForUser = function(database, userID) {
   let newDatabase = {};
@@ -28,8 +20,13 @@ const urlsForUser = function(database, userID) {
   return newDatabase;
 };
 
+// create random 6 letter/nmber string for an id tag
+const generateRandomString = () => {
+  return Math.random().toString(36).substring(2, 8);
+};
 
 module.exports = {
   getUserByEmail,
   urlsForUser,
+  generateRandomString
 }

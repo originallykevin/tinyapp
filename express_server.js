@@ -18,8 +18,8 @@ app.use(cookieSession({
 
 //////// HELPER FUNCTIONS /////////
 // keeping seperate to see comments of each
-const { getUserByEmail } = require('./helpers'); // check if email is in users{ } for 
-const { urlsForUser } = require('./helpers'); // user can only see their database 
+const { getUserByEmail, urlsForUser ,generateRandomString } = require('./helpers'); 
+
 
 
 // NEW database
@@ -60,10 +60,6 @@ const users = {
   }
 };
 
-// create random 6 letter/nmber string for an id tag
-const generateRandomString = () => {
-  return Math.random().toString(36).substring(2, 8);
-};
 
 // submit handle for new url items
 app.post("/urls", (req, res) => {
