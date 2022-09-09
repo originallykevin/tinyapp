@@ -1,13 +1,21 @@
 /// HELPER FUNCTIONS ///
 
 // check if email is in users{ } for 
-const getUserByEmail = function(users, email) {
-  for (let user in users) {
-    if (users[user].email === email) {
+const getUserByEmail = function(email, database) {
+  for (let user in database) {
+    if (database[user].email === email) {
       return user;
     }
   }
 };
+
+// const getUserByEmail = function(users, email) {
+//   for (let user in users) {
+//     if (users[user].email === email) {
+//       return user;
+//     }
+//   }
+// };
 
 // user can only see their database 
 const urlsForUser = function(database, userID) {

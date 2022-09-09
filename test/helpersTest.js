@@ -17,7 +17,7 @@ const testUsers = {
 
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
-    const user = getUserByEmail(testUsers, "user@example.com")
+    const user = getUserByEmail("user@example.com", testUsers)
     const expectedUserID = "userRandomID";
     assert.equal(user, expectedUserID)
   });
@@ -25,7 +25,7 @@ describe('getUserByEmail', function() {
 
 describe('getUserByEmail', function() {
   it('should return a user with valid email', function() {
-    const user = getUserByEmail(testUsers, "user2@example.com")
+    const user = getUserByEmail("user2@example.com", testUsers)
     const expectedUserID = "user2RandomID";
     assert.equal(user, expectedUserID)
   });
@@ -33,7 +33,7 @@ describe('getUserByEmail', function() {
 
 describe('getUserByEmail', function() {
   it('should return undefined if email not in user database', function() {
-    const user = getUserByEmail(testUsers, "hello@nori.com")
+    const user = getUserByEmail("hello@nori.com", testUsers)
     const expectedUserID = undefined;
     assert.equal(user, expectedUserID)
   });

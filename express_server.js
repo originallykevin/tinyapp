@@ -84,7 +84,7 @@ app.post("/urls", (req, res) => {
 app.post('/login', (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
-  const user_id = getUserByEmail(users, userEmail);
+  const user_id = getUserByEmail(userEmail, users);
   // check if user email found
   if (!user_id) {
     return res.status(403).send('No user with that username found');
@@ -134,7 +134,7 @@ app.post('/register', (req, res) => {
     return res.status(404).send('Please enter email and password.');
   }
   // register with an email that is already in the users object, send 404
-  if (getUserByEmail(users, email)) {
+  if (getUserByEmail(email, users)) {
     return res.status(404).send('A user with that email already exists');
   }
   // Adding salt + hash
