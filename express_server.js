@@ -67,7 +67,6 @@ app.post("/urls", (req, res) => {
     return res.status(403).send('Please login to shorten URL');
   }
   const id = generateRandomString();
-  console.log(req.body); // Log the POST request body to the console
   urlDatabase[id] = {
     longURL: `https://${req.body.longURL}`,
     userID: user_id,
@@ -88,7 +87,6 @@ app.post("/login", (req, res) => {
   // check if user email and user password match
   // result is a boolean, if true, client is logged in
   if (users[user_id].email === userEmail && result) {
-    // res.cookie("user_id", user_id); // cookie with user_id
     req.session.user_id = user_id;
     return res.redirect("/urls");
   } else {
@@ -97,7 +95,6 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/logout", (req, res) => {
-  // res.clearCookie("user_id"); // once logout, cookies will be cleared
   req.session = null;
   res.redirect("/urls");
 });
@@ -140,7 +137,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const user_id = generateRandomString(); // generate random userID
+  const user_id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
   // If the e-mail or password are empty strings, send 404
@@ -160,8 +157,6 @@ app.post("/register", (req, res) => {
     email,
     password: hash // update password to hashed password
   };
-  // console.log("users[user_id]", users); // check if new user gets added to user list
-  // res.cookie("user_id", user_id);
   req.session.user_id = user_id;
   return res.redirect("/urls");
 });
@@ -193,8 +188,8 @@ app.get("/register", (req, res) => {
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
-  if (!user_id) { // if user not logged in redirect to 403 
-    // return res.render('403'); // As per project instructions but removing and redirect to login page instead because it sends a 403 after GET /logout
+  if (!user_id) { // if user not logged in 
+    // As per project instructions but removing and redirect to login page instead because it sends a 403 after GET /logout
     return res.redirect("/login");
   }
   const templateVars = {
@@ -259,7 +254,6 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/", (req, res) => {
   const user_id = req.session['user_id'];
-  // if user is not logged in. redirect to /login
   if (!user_id) {
     return res.redirect("/login");
   }
