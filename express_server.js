@@ -4,7 +4,7 @@ const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080; 
 
 app.set("view engine", "ejs");
 
@@ -19,7 +19,7 @@ app.use(cookieSession({
 //////// HELPER FUNCTIONS /////////
 const { getUserByEmail, urlsForUser, generateRandomString } = require('./helpers');
 
-// NEW database
+// New database
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
@@ -34,7 +34,7 @@ const urlDatabase = {
     userID: "myUser",
   },
   b2xVn2: {
-    longURL: "http://www.lighthouselabs.ca",
+    longURL: "https://www.lighthouselabs.ca",
     userID: "myUser",
   }
 };
@@ -58,13 +58,11 @@ const users = {
   }
 };
 
-
 // submit handle for new url items
 app.post("/urls", (req, res) => {
-  // prevent users not logged in from POST /urls for security measures
   const user_id = req.session.user_id;
   if (!user_id) {
-    return res.status(403).send('Please login to shorten URL');
+    return res.status(403).send('Please login to shorten URL.');
   }
   const id = generateRandomString();
   urlDatabase[id] = {
@@ -74,23 +72,20 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls/${id}`);
 });
 
+// logging into app
 app.post("/login", (req, res) => {
   const userEmail = req.body.email;
   const userPassword = req.body.password;
   const user_id = getUserByEmail(userEmail, users);
-  // check if user email found
   if (!user_id) {
-    return res.status(403).send('No user with that username found');
+    return res.status(403).send('No user with that username found.');
   }
-  // compare user enter password vs. hashed password and return/false
   const result = bcrypt.compareSync(userPassword, users[user_id].password);
-  // check if user email and user password match
-  // result is a boolean, if true, client is logged in
   if (users[user_id].email === userEmail && result) {
     req.session.user_id = user_id;
     return res.redirect("/urls");
   } else {
-    return res.status(403).send('username or password does not match');
+    return res.status(403).send('username or password does not match.');
   }
 });
 
@@ -99,31 +94,29 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// deleting a url
 app.post("/urls/:id/delete", (req, res) => {
   const user_id = req.session['user_id'];
   const id = req.params.id;
-  // if shortURL(id) does not exist
   if (!urlDatabase[id]) {
-    return res.status(404).send('This shortURL does not exist');
+    return res.status(404).send('This shortURL does not exist.');
   }
-  // if user not logged in or user does not match
   if (!user_id || urlDatabase[id].userID !== user_id) {
-    return res.status(403).render('403');
+    return res.status(403).send('You do not have access to this page.');
   }
   delete urlDatabase[id];
   res.redirect("/urls");
 });
 
+// upate existing short url
 app.post("/urls/:id", (req, res) => {
   const user_id = req.session['user_id'];
   const id = req.params.id;
-  // if shortURL(id) does not exist
   if (!urlDatabase[id]) {
-    return res.status(404).send('This shortURL does not exist');
+    return res.status(404).send('This shortURL does not exist.');
   }
-  // if user not logged in or user does not match
   if (!user_id || urlDatabase[id].userID !== user_id) {
-    return res.status(403).render('403');
+    return res.status(403).send('You do not have access to this page.');
   }
   urlDatabase[id] = {
     longURL: req.body.newURLname,
@@ -132,26 +125,24 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+
+// register new user and password
 app.post("/register", (req, res) => {
   const user_id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  // If the e-mail or password are empty strings, send 404
   if (!email || !password) {
-    return res.status(404).send('Please enter email and password');
+    return res.status(404).send('Please enter email and password.');
   }
-  // register with an email that is already in the users object, send 404
   if (getUserByEmail(email, users)) {
-    return res.status(404).send('A user with that email already exists');
+    return res.status(404).send('A user with that email already exists.');
   }
-  // Adding salt + hash
   const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(password, salt);
 
-  // Move database under if statement above because we want to check email against existing database prior to adding it. 
   users[user_id] = {
     email,
-    password: hash // update password to hashed password
+    password: hash
   };
   req.session.user_id = user_id;
   return res.redirect("/urls");
@@ -159,7 +150,6 @@ app.post("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   const user_id = req.session['user_id'];
-  // if user is logged in, /login will redirect to /urls
   if (user_id) {
     return res.redirect('/urls');
   }
@@ -171,7 +161,6 @@ app.get("/login", (req, res) => {
 
 app.get("/register", (req, res) => {
   const user_id = req.session['user_id'];
-  // if user is logged in, /register will redirect to /urls
   if (user_id) {
     return res.redirect('/urls');
   }
@@ -184,13 +173,13 @@ app.get("/register", (req, res) => {
 // BROWSE - GET /urls 
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
-  if (!user_id) { // if user not logged in 
-    // As per project instructions but removing and redirect to login page instead because it sends a 403 after GET /logout
+  const urls = urlsForUser(urlDatabase, user_id);
+  if (!user_id) {
     return res.redirect("/login");
   }
   const templateVars = {
-    urls: urlsForUser(urlDatabase, user_id),
-    user: users[user_id], // this has value of generated id
+    urls,
+    user: users[user_id],
   };
   res.render("urls_index", templateVars);
 });
@@ -198,10 +187,8 @@ app.get("/urls", (req, res) => {
 // READ - GET /u/:id
 app.get("/u/:id", (req, res) => {
   const id = req.params.id;
-  // if user tries to access a shorten url not in database
   if (!urlDatabase[id]) {
-    return res.status(404).render('404');
-    // url is not found then it will be directed to 404.ejs
+    return res.status(404).send('This short url does not exist.');
   } else {
     const longURL = urlDatabase[id].longURL;
     res.redirect(longURL);
@@ -211,7 +198,6 @@ app.get("/u/:id", (req, res) => {
 // GET req to add new url
 app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
-  // if user is not logged in, redirect to /login
   if (!user_id) {
     return res.redirect('/login');
   }
@@ -226,16 +212,14 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const user_id = req.session['user_id'];
-  // if user not logged in and trying to access a shorturl
   if (!user_id) {
-    return res.status(403).render('403');
+    return res.status(403).send('You do not have access to this page.');
   }
   if (!urlDatabase[id]) {
-    return res.status(404).render('404'); // if shorturl does not exist in database
+    return res.status(404).send('This short url does not exist.');
   }
-  // if user logged in trying to access shorturl that is not theirs
   if (urlDatabase[id].userID !== user_id) {
-    return res.status(403).render('403');
+    return res.status(403).send('You do not have access to this short url.');
   }
   const templateVars = {
     id: id,
