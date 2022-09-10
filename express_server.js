@@ -68,7 +68,7 @@ app.post("/urls", (req, res) => {
   }
   const id = generateRandomString();
   urlDatabase[id] = {
-    longURL: `https://${req.body.longURL}`,
+    longURL: req.body.longURL,
     userID: user_id,
   };
   res.redirect(`/urls/${id}`);
@@ -110,10 +110,6 @@ app.post("/urls/:id/delete", (req, res) => {
   if (!user_id || urlDatabase[id].userID !== user_id) {
     return res.status(403).render('403');
   }
-  urlDatabase[id] = {
-    longURL: `https://${req.body.newURLname}`,
-    userID: user_id,
-  };
   delete urlDatabase[id];
   res.redirect("/urls");
 });
@@ -130,7 +126,7 @@ app.post("/urls/:id", (req, res) => {
     return res.status(403).render('403');
   }
   urlDatabase[id] = {
-    longURL: `https://${req.body.newURLname}`,
+    longURL: req.body.newURLname,
     userID: user_id,
   };
   res.redirect("/urls");
